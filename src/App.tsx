@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import { useTimer } from 'react-timer-hook';
 import logo from './logo.svg';
 import './App.css';
 
@@ -116,6 +117,27 @@ function App() {
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [answers, setAnswers] = useState([0, 0, 0, 0, 0, 0]);
+  const [timeLimit, setTimeLimit] = useState(1);
+  const [timerExpiry, setTimerExpiry] = useState(new Date());
+
+  const onTimerExpire = () => {
+    if(started && !lost) {
+      setLost(true);
+    }
+  }
+
+  const {
+    totalSeconds,
+    seconds,
+    minutes,
+    hours,
+    days,
+    isRunning,
+    start,
+    pause,
+    resume,
+    restart,
+  } = useTimer({ expiryTimestamp: timerExpiry, onExpire: onTimerExpire });
 
   const initializeMultiplication = () => {
     const n1 = randomIntegerInRange(minNumber, maxNumber);
@@ -132,6 +154,11 @@ function App() {
     setLost(false)
     setScore(0)
 
+    const expiryTimestamp = new Date();
+    expiryTimestamp.setSeconds(expiryTimestamp.getSeconds() + (timeLimit * 60))
+    setTimerExpiry(expiryTimestamp)
+    restart(expiryTimestamp)
+
     initializeMultiplication()
   }
 
@@ -145,6 +172,7 @@ function App() {
 
   const onWrongAnswer = () => {
     setLost(true)
+    pause()
   }
 
   const onChangeMinMax = (min: number, max: number) => {
@@ -159,6 +187,7 @@ function App() {
         Multiplicathlon!
         <MinAndMax min={minNumber} max={maxNumber} onChange={onChangeMinMax} />
         <p>Plus haut score:{highScore}</p>
+        <p>{seconds} secondes</p>
         <p>Score:{score}</p>        
         {!started ?
           <Button variant="contained" onClick={initializeGame}>Commençons!</Button> :
