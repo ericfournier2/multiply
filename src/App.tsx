@@ -1,10 +1,15 @@
-import React from 'react';
 import { useState } from 'react';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import { useTimer } from 'react-timer-hook';
-import logo from './logo.svg';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 import './App.css';
+
+import {Options, defaultGameOptions} from './Options';
+import type { GameOptions } from './Options';
 
 function randomInteger(int: number) {
   return Math.floor(Math.random() * int)
@@ -107,6 +112,8 @@ const MinAndMax = ({min, max, onChange}: MinMaxProps) => {
   );
 }
 
+
+
 function App() {
   const [started, setStarted] = useState(false);
   const [lost, setLost] = useState(false);
@@ -119,6 +126,7 @@ function App() {
   const [answers, setAnswers] = useState([0, 0, 0, 0, 0, 0]);
   const [timeLimit, setTimeLimit] = useState(1);
   const [timerExpiry, setTimerExpiry] = useState(new Date());
+  const [options, setOptions] = useState(defaultGameOptions);
 
   const onTimerExpire = () => {
     if(started && !lost) {
@@ -140,9 +148,17 @@ function App() {
   } = useTimer({ expiryTimestamp: timerExpiry, onExpire: onTimerExpire });
 
   const initializeMultiplication = () => {
-    const n1 = randomIntegerInRange(minNumber, maxNumber);
-    const n2 = randomIntegerInRange(minNumber, maxNumber);
-
+    let n1 = 0;
+    let n2 = 0;
+    
+    if(!options.useTables) {
+      n1 = randomIntegerInRange(minNumber, maxNumber);
+      n2 = randomIntegerInRange(minNumber, maxNumber);
+    } else {
+      n1 = options.tables[randomIntegerInRange(0, options.tables.length)];
+      n2 = randomIntegerInRange(minNumber, maxNumber);
+    }
+    
     setFirstNumber(n1)
     setSecondNumber(n2)
 
@@ -181,10 +197,14 @@ function App() {
     initializeGame()
   }
 
+  const onOptionsChange = (options: GameOptions) => {
+    setOptions(options);
+  }
+
   return (
     <div className="App">
       <header className="App-header">
-        Multiplicathlon!
+        Multiplicathlon!<Options options={options} onChange={onOptionsChange} />
         <MinAndMax min={minNumber} max={maxNumber} onChange={onChangeMinMax} />
         <p>Plus haut score:{highScore}</p>
         <p>{seconds} secondes</p>
