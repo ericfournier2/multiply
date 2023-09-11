@@ -91,40 +91,14 @@ const AnswerArray = ({answers, firstNumber, secondNumber, onRightAnswer, onWrong
   );
 }
 
-type MinMaxProps = {
-  min: number, 
-  max: number,
-  onChange: (min: number, max: number) => void,
-}
-
-const MinAndMax = ({min, max, onChange}: MinMaxProps) => {
-  return (
-    <>
-      <Stack spacing={2} direction="row">
-        De: <Button variant="outlined"  onClick={ () => {onChange(min-1, max)} }>-</Button>
-        {min}<Button variant="outlined"  disabled={min==max} onClick={ () => {onChange(min+1, max)} }>+</Button>
-      </Stack>
-      <Stack spacing={2} direction="row">
-        À: <Button variant="outlined" disabled={min==max} onClick={ () => {onChange(min, max - 1)} }>-</Button>
-        {max}<Button variant="outlined"  onClick={ () => {onChange(min, max + 1)} }>+</Button>
-      </Stack>
-    </>
-  );
-}
-
-
-
 function App() {
   const [started, setStarted] = useState(false);
   const [lost, setLost] = useState(false);
-  const [minNumber, setMinNumber] = useState(2);
-  const [maxNumber, setMaxNumber] = useState(12);
   const [firstNumber, setFirstNumber] = useState(0);
   const [secondNumber, setSecondNumber] = useState(0);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [answers, setAnswers] = useState([0, 0, 0, 0, 0, 0]);
-  const [timeLimit, setTimeLimit] = useState(1);
   const [timerExpiry, setTimerExpiry] = useState(new Date());
   const [options, setOptions] = useState(defaultGameOptions);
 
@@ -152,13 +126,17 @@ function App() {
     let n2 = 0;
     
     if(!options.useTables) {
-      n1 = randomIntegerInRange(minNumber, maxNumber);
-      n2 = randomIntegerInRange(minNumber, maxNumber);
+      n1 = randomIntegerInRange(options.minNumber, options.maxNumber);
+      n2 = randomIntegerInRange(options.minNumber, options.maxNumber);
     } else {
       n1 = options.tables[randomIntegerInRange(0, options.tables.length)];
-      n2 = randomIntegerInRange(minNumber, maxNumber);
+      if(options.excludeZeroAndOne) {
+        n2 = randomIntegerInRange(2, options.maxNumber);
+      } else {
+        n2 = randomIntegerInRange(0, options.maxNumber);
+      }
     }
-    
+
     setFirstNumber(n1)
     setSecondNumber(n2)
 
@@ -171,7 +149,7 @@ function App() {
     setScore(0)
 
     const expiryTimestamp = new Date();
-    expiryTimestamp.setSeconds(expiryTimestamp.getSeconds() + (timeLimit * 60))
+    expiryTimestamp.setSeconds(expiryTimestamp.getSeconds() + (options.timeLimit * 60))
     setTimerExpiry(expiryTimestamp)
     restart(expiryTimestamp)
 
@@ -191,12 +169,6 @@ function App() {
     pause()
   }
 
-  const onChangeMinMax = (min: number, max: number) => {
-    setMinNumber(min)
-    setMaxNumber(max)
-    initializeGame()
-  }
-
   const onOptionsChange = (options: GameOptions) => {
     setOptions(options);
   }
@@ -205,7 +177,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         Multiplicathlon!<Options options={options} onChange={onOptionsChange} />
-        <MinAndMax min={minNumber} max={maxNumber} onChange={onChangeMinMax} />
+
         <p>Plus haut score:{highScore}</p>
         <p>{seconds} secondes</p>
         <p>Score:{score}</p>        
