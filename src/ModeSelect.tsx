@@ -9,18 +9,19 @@ type ModeButtonProps = {
   title: string,
   description: string,
   onClick: () => void,
+  disabled?: boolean
 }
 
-function ModeButton({title, description, onClick}: ModeButtonProps) {
+function ModeButton({title, description, onClick, disabled=false}: ModeButtonProps) {
   return(
     <Grid item xs={4}>
     <Card>
       <CardContent>
-        <Typography variant="h5">{title}</Typography>
+        <Typography variant="h5" sx={{backgroundColor:"lightgrey"}}>{title}</Typography>
         <Typography variant="body1">{description}</Typography>
       </CardContent>
       <CardActions>
-        <Button onClick={onClick} variant="contained" fullWidth>Jouer!</Button>
+        <Button onClick={onClick} variant="contained" fullWidth disabled={disabled}>Jouer!</Button>
       </CardActions>
     </Card>
   </Grid>
@@ -37,8 +38,8 @@ function ModeSelect({onSelect}: ModeSelectProps) {
   return(
     <Grid container spacing={4}>
       <ModeButton title="Mort soudaine" description="Une erreur, et c'est fini!" onClick={modeSelectCallback("suddenDeath")}/>
-      <ModeButton title="Temps limite" description="Fais le plus de point dans le temps imparti!" onClick={modeSelectCallback("timeLimit")}/>
-      <ModeButton title="Jeu de paires" description="Trouve les paires d'opérations!" onClick={modeSelectCallback("pairs")}/>
+      <ModeButton title="Temps limite" description="Fais le plus de point dans le temps imparti!" onClick={modeSelectCallback("timeLimit")} disabled/>
+      <ModeButton title="Jeu de paires" description="Trouve les paires d'opérations!" onClick={modeSelectCallback("pairs")} disabled/>
     </Grid>
   );
 }

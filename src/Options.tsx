@@ -23,9 +23,9 @@ type GameOptions = {
 
 const defaultGameOptions: GameOptions = {
   minNumber: 2,
-  maxNumber: 12,
-  useTables: false,
-  tables: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  maxNumber: 10,
+  useTables: true,
+  tables: [2, 3, 5, 10],
   timeLimit: 1,
   excludeZeroAndOne: true
 }
