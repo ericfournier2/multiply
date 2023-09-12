@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useTimer } from 'react-timer-hook';
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+import type { TimeProps }  from 'react-countdown-circle-timer'
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -89,9 +91,29 @@ function Quiz({mode, options, onQuit}: QuizProps) {
     onQuit(score)
   }
 
+  const renderTime = ({ remainingTime }: TimeProps) => {
+    if (remainingTime === 0) {
+      return <div className="timer">Terminé!</div>;
+    }
+  
+    return (
+      <div className="timer">
+        <div className="value">{remainingTime}</div>
+        <div className="text">secondes</div>
+      </div>
+    );
+  };
+
   return (
     <Container>
-        <Typography>{seconds} secondes</Typography>
+        <CountdownCircleTimer
+          isPlaying
+          duration={options.timeLimit * 60}
+          colors={['#32a852', '#fff824', '#f70000']}
+          colorsTime={[options.timeLimit * 60, options.timeLimit * 30, 0]}          
+        >
+          {renderTime}
+        </CountdownCircleTimer>
         <Typography>Score:{score}</Typography>        
         {!lost ?
             <Question firstNumber={firstNumber} 
