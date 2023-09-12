@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import {randomInteger, randomIntegerInRange, shuffleArray} from './Utils';
-
-
-
 
 function generateAnswersArray(firstNumber: number, secondNumber: number, nAnswers: number) {
   var answers = [firstNumber * secondNumber]
@@ -62,7 +60,7 @@ const AnswerButton = ({answer, firstNumber, secondNumber, onRightAnswer, onWrong
 
 
   return (
-    <Button variant="contained" onClick={onClick} color={hasBeenClicked ? (isRightAnswer ? "success" : "error") : "primary"}>{answer}</Button>
+    <Button fullWidth size="large" variant="contained" onClick={onClick} color={hasBeenClicked ? (isRightAnswer ? "success" : "error") : "primary"}>{answer}</Button>
   );
 }
 
@@ -77,9 +75,9 @@ type AnswerArrayProps = {
 const AnswerArray = ({answers, firstNumber, secondNumber, onRightAnswer, onWrongAnswer} : AnswerArrayProps) => {
   var buttons = answers.map((x) => <AnswerButton answer={x} firstNumber={firstNumber} secondNumber={secondNumber} onRightAnswer={onRightAnswer} onWrongAnswer={onWrongAnswer} />);
   return (
-    <Stack spacing={2} direction="row">
-      {buttons}
-    </Stack>
+    <Grid container spacing={2}>
+      {buttons.map((x) => <Grid item xs={4}>{x}</Grid>)}
+    </Grid>
   );
 }
 
@@ -108,7 +106,7 @@ const Question = ({firstNumber, secondNumber, onRightAnswer, onWrongAnswer}: Que
 
   return(
     <>
-      <Typography>{firstNumber} x {secondNumber}</Typography>
+      <Typography variant="h3">{firstNumber} x {secondNumber}</Typography>
       <AnswerArray answers={answers} firstNumber={firstNumber} secondNumber={secondNumber} onRightAnswer={rightAnswer} onWrongAnswer={wrongAnswer} />
     </>
   );

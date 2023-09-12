@@ -5,6 +5,8 @@ import type { TimeProps }  from 'react-countdown-circle-timer'
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
 
 import { randomIntegerInRange } from './Utils';
 import type { GameOptions } from './Options';
@@ -105,25 +107,34 @@ function Quiz({mode, options, onQuit}: QuizProps) {
   };
 
   return (
-    <Container>
-        <CountdownCircleTimer
-          isPlaying
-          duration={options.timeLimit * 60}
-          colors={['#32a852', '#fff824', '#f70000']}
-          colorsTime={[options.timeLimit * 60, options.timeLimit * 30, 0]}          
-        >
-          {renderTime}
-        </CountdownCircleTimer>
-        <Typography>Score:{score}</Typography>        
-        {!lost ?
-            <Question firstNumber={firstNumber} 
-                      secondNumber={secondNumber} 
-                      onRightAnswer={onRightAnswer}
-                      onWrongAnswer={onWrongAnswer} 
-                      key={questionKey}/> :
-            <Button variant="contained" onClick={restartClick}>Recommencez?</Button>
-        }    
-    </Container>
+    <Paper>
+      <Grid container>
+        <Grid item xs={8}>
+          <Typography variant="h4">Score:{score}</Typography>
+        </Grid>
+        <Grid item xs={4}>
+          <CountdownCircleTimer
+            size={90}
+            isPlaying
+            duration={options.timeLimit * 60}
+            colors={['#32a852', '#fff824', '#f70000']}
+            colorsTime={[options.timeLimit * 60, options.timeLimit * 30, 0]}          
+          >
+            {renderTime}
+          </CountdownCircleTimer>
+        </Grid>
+        <Grid item xs={12}>
+          {!lost ?
+              <Question firstNumber={firstNumber} 
+                        secondNumber={secondNumber} 
+                        onRightAnswer={onRightAnswer}
+                        onWrongAnswer={onWrongAnswer} 
+                        key={questionKey}/> :
+              <Button variant="contained" onClick={restartClick}>Recommencez?</Button>
+          }    
+        </Grid>        
+      </Grid>
+    </Paper>    
   );
 }
 
