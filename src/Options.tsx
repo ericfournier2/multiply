@@ -124,7 +124,7 @@ function Options({options, onChange} : OptionsProps) {
 
   return(
     <>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      <Button onClick={handleClickOpen} color="inherit" size="large">
         <MenuIcon />
       </Button>
       <Dialog open={open} onClose={handleClose}>

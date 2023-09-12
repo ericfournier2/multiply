@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useTimer } from 'react-timer-hook';
 import Button from '@mui/material/Button';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -10,6 +14,7 @@ import './App.css';
 
 import { randomIntegerInRange } from './Utils';
 import { Options, defaultGameOptions } from './Options';
+import ModeSelect from './ModeSelect';
 import type { GameOptions } from './Options';
 import { Question } from "./Question";
 
@@ -94,22 +99,34 @@ function App() {
     setOptions(options);
   }
 
+  const onModeSelect = (mode:string) => {
+    alert(mode);
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        Multiplicathlon!<Options options={options} onChange={onOptionsChange} />
-
+      <AppBar>
+        <Toolbar>
+          <Options options={options} onChange={onOptionsChange} />
+          <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
+            Multiplicathlon!
+          </Typography>
+          <Button color="inherit">Login</Button>
+        </Toolbar>
+      </AppBar>
+      <Toolbar />
+      <Container>
         <p>Plus haut score:{highScore}</p>
         <p>{seconds} secondes</p>
         <p>Score:{score}</p>        
+        <ModeSelect onSelect={onModeSelect}/>
         {!started ?
           <Button variant="contained" onClick={initializeGame}>Commençons!</Button> :
           !lost ?
-            <><Question firstNumber={firstNumber} secondNumber={secondNumber} onRightAnswer={onRightAnswer} onWrongAnswer={onWrongAnswer} key={questionKey}/>
-            </> :
+            <Question firstNumber={firstNumber} secondNumber={secondNumber} onRightAnswer={onRightAnswer} onWrongAnswer={onWrongAnswer} key={questionKey}/>:
             <><p>Vous avez perdu! :(</p><Button variant="contained" onClick={initializeGame}>Recommencez?</Button></>
         }        
-      </header>
+      </Container>
     </div>
   );
 }

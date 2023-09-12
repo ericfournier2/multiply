@@ -40,16 +40,29 @@ type AnswerButtonProps = {
 }
 
 const AnswerButton = ({answer, firstNumber, secondNumber, onRightAnswer, onWrongAnswer} : AnswerButtonProps) => {
+  const [hasBeenClicked, setHasBeenClicked] = useState(false);
+  const isRightAnswer = answer == (firstNumber * secondNumber)
+
   const onClick = () => {
-    if(answer == (firstNumber * secondNumber)) {
+    setHasBeenClicked(true);
+
+    if(isRightAnswer) {
       onRightAnswer();
     } else {
       onWrongAnswer();
     }
   }
   
+  // let buttonColor = "primary";
+  // if(hasBeenClicked && isRightAnswer) {
+  //   buttonColor = "success";
+  // } else {
+  //   buttonColor = "error";
+  // }
+
+
   return (
-    <Button variant="contained" onClick={onClick}>{answer}</Button>
+    <Button variant="contained" onClick={onClick} color={hasBeenClicked ? (isRightAnswer ? "success" : "error") : "primary"}>{answer}</Button>
   );
 }
 
@@ -79,11 +92,24 @@ type QuestionProps = {
 
 const Question = ({firstNumber, secondNumber, onRightAnswer, onWrongAnswer}: QuestionProps) => {
   const [answers, setAnswers] = useState(generateAnswersArray(firstNumber, secondNumber, 6))
-  
+  const [wrong, setWrong] = useState(false);
+
+  const wrongAnswer = () => {
+    setWrong(true);
+  }
+
+  const rightAnswer = () => {
+    if(wrong) {
+      onWrongAnswer()
+    } else {
+      onRightAnswer()
+    }
+  }
+
   return(
     <>
       <Typography>{firstNumber} x {secondNumber}</Typography>
-      <AnswerArray answers={answers} firstNumber={firstNumber} secondNumber={secondNumber} onRightAnswer={onRightAnswer} onWrongAnswer={onWrongAnswer} />
+      <AnswerArray answers={answers} firstNumber={firstNumber} secondNumber={secondNumber} onRightAnswer={rightAnswer} onWrongAnswer={wrongAnswer} />
     </>
   );
 }
