@@ -152,6 +152,7 @@ function Quiz({mode, options, onQuit}: QuizProps) {
                         secondNumber={secondNumber} 
                         onRightAnswer={onRightAnswer}
                         onWrongAnswer={onWrongAnswer} 
+                        multipleChoices={false}
                         key={questionKey}/> :
               <>
                 <Typography>Partie terminée!</Typography>

@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 import {randomInteger, randomIntegerInRange, shuffleArray} from './Utils';
 
 function generateAnswersArray(firstNumber: number, secondNumber: number, nAnswers: number) {
@@ -81,14 +82,56 @@ const AnswerArray = ({answers, firstNumber, secondNumber, onRightAnswer, onWrong
   );
 }
 
+type AnswerFieldProps = {
+  firstNumber: number, 
+  secondNumber: number,
+  onRightAnswer: () => void,
+  onWrongAnswer: () => void  
+}
+
+const AnswerField = ({firstNumber, secondNumber, onRightAnswer, onWrongAnswer} : AnswerFieldProps) => {
+  const [text, setText] = useState("")
+  const [error, setError] = useState(false)
+
+  const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setText(event.target.value)
+  }
+
+  const handleTextKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    console.log(event)
+    if((event.key === "Enter") && (text !== "")) {
+      if(parseInt(text) === (firstNumber * secondNumber)) {
+        onRightAnswer()
+      } else {
+        setError(true)
+        onWrongAnswer()
+      }
+    }
+  }
+
+  return(
+    <TextField 
+      error={error}
+      onChange={handleTextChange} 
+      onKeyDown={handleTextKeyDown} 
+      inputRef={(input) => {
+        if(input != null) {
+           input.focus();
+        }
+      }}
+    />
+  );
+}
+
 type QuestionProps = {
   firstNumber: number, 
   secondNumber: number,  
+  multipleChoices: boolean,
   onRightAnswer: () => void,
   onWrongAnswer: () => void   
 }
 
-const Question = ({firstNumber, secondNumber, onRightAnswer, onWrongAnswer}: QuestionProps) => {
+const Question = ({firstNumber, secondNumber, multipleChoices, onRightAnswer, onWrongAnswer}: QuestionProps) => {
   const [answers, setAnswers] = useState(generateAnswersArray(firstNumber, secondNumber, 6))
   const [wrong, setWrong] = useState(false);
 
@@ -104,10 +147,29 @@ const Question = ({firstNumber, secondNumber, onRightAnswer, onWrongAnswer}: Que
     }
   }
 
+  const answerInput = () => {
+    if(multipleChoices) {
+      return <AnswerArray 
+        answers={answers} 
+        firstNumber={firstNumber} 
+        secondNumber={secondNumber} 
+        onRightAnswer={rightAnswer} 
+        onWrongAnswer={wrongAnswer} 
+      />
+    } else {
+      return <AnswerField 
+        firstNumber={firstNumber} 
+        secondNumber={secondNumber} 
+        onRightAnswer={rightAnswer} 
+        onWrongAnswer={wrongAnswer} 
+      />
+    }
+  }
+
   return(
     <>
       <Typography variant="h3">{firstNumber} x {secondNumber}</Typography>
-      <AnswerArray answers={answers} firstNumber={firstNumber} secondNumber={secondNumber} onRightAnswer={rightAnswer} onWrongAnswer={wrongAnswer} />
+      {answerInput()}
     </>
   );
 }
