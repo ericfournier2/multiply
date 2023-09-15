@@ -8,16 +8,18 @@ import CardContent from '@mui/material/CardContent';
 type ModeButtonProps = {
   title: string,
   description: string,
+  icon: string,
   onClick: () => void,
   disabled?: boolean
 }
 
-function ModeButton({title, description, onClick, disabled=false}: ModeButtonProps) {
+function ModeButton({title, description, icon, onClick, disabled=false}: ModeButtonProps) {
   return(
     <Grid item xs={4}>
     <Card>
       <CardContent>
         <Typography variant="h5" sx={{backgroundColor:"lightgrey"}}>{title}</Typography>
+        <img src={icon} width="90%" />
         <Typography variant="body1">{description}</Typography>
       </CardContent>
       <CardActions>
@@ -37,9 +39,9 @@ function ModeSelect({onSelect}: ModeSelectProps) {
 
   return(
     <Grid container spacing={4}>
-      <ModeButton title="Mort soudaine" description="Une erreur, et c'est fini!" onClick={modeSelectCallback("suddenDeath")}/>
-      <ModeButton title="Temps limite" description="Fais le plus de point dans le temps imparti!" onClick={modeSelectCallback("timeLimit")} />
-      <ModeButton title="Jeu de paires" description="Trouve les paires d'opérations!" onClick={modeSelectCallback("pairs")} disabled/>
+      <ModeButton icon="suddendeathicon.svg" title="Mort soudaine" description="Une erreur, et c'est fini!" onClick={modeSelectCallback("suddenDeath")}/>
+      <ModeButton icon="stopwatch.svg" title="Temps limite" description="Fais le plus de point dans le temps imparti!" onClick={modeSelectCallback("timeLimit")} />
+      <ModeButton icon="pairs.svg" title="Jeu de paires" description="Trouve les paires d'opérations!" onClick={modeSelectCallback("pairs")} disabled/>
     </Grid>
   );
 }
