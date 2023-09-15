@@ -38,7 +38,7 @@ function ModeSelect({onSelect}: ModeSelectProps) {
   return(
     <Grid container spacing={4}>
       <ModeButton title="Mort soudaine" description="Une erreur, et c'est fini!" onClick={modeSelectCallback("suddenDeath")}/>
-      <ModeButton title="Temps limite" description="Fais le plus de point dans le temps imparti!" onClick={modeSelectCallback("timeLimit")} disabled/>
+      <ModeButton title="Temps limite" description="Fais le plus de point dans le temps imparti!" onClick={modeSelectCallback("timeLimit")} />
       <ModeButton title="Jeu de paires" description="Trouve les paires d'opérations!" onClick={modeSelectCallback("pairs")} disabled/>
     </Grid>
   );

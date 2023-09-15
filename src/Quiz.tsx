@@ -41,6 +41,7 @@ function pickNumbers(options: GameOptions) {
 function Quiz({mode, options, onQuit}: QuizProps) {
   const [lost, setLost] = useState(false);
   const [score, setScore] = useState(0);
+  const [wrongAnswers, setWrongAnswers] = useState(0);
   const [questionKey, setQuestionKey] = useState(1);
 
   // Pick default numbers to be used on the first render.
@@ -54,7 +55,9 @@ function Quiz({mode, options, onQuit}: QuizProps) {
   const [timerExpiry, setTimerExpiry] = useState(expiryTimestamp);
 
   const onTimerExpire = () => {
-    setLost(true);
+    if(mode == "timeLimit") {
+      setLost(true);
+    }
   }
 
   const {
@@ -85,8 +88,12 @@ function Quiz({mode, options, onQuit}: QuizProps) {
   }
 
   const onWrongAnswer = () => {
-    setLost(true)
-    pause()
+    setWrongAnswers(wrongAnswers + 1)
+    if(mode == "suddenDeath") {
+      setLost(true)
+    } else {
+      initializeMultiplication()      
+    }
   }
 
   const restartClick = () => {
@@ -106,6 +113,30 @@ function Quiz({mode, options, onQuit}: QuizProps) {
     );
   };
 
+  const renderTimer = () => {
+    if(mode == "timeLimit") {
+      return <CountdownCircleTimer
+        size={90}
+        isPlaying
+        duration={options.timeLimit * 60}
+        colors={['#32a852', '#fff824', '#f70000']}
+        colorsTime={[options.timeLimit * 60, options.timeLimit * 30, 0]}          
+      >
+        {renderTime}
+      </CountdownCircleTimer>
+    } else {
+      return null;
+    }
+  }
+
+  const gameSummary = () => {
+    if(mode == "timeLimit") {    
+      return <Typography>Résultats: {score} / {score + wrongAnswers} ({(score * 100 / (score + wrongAnswers)).toFixed(0)}%)</Typography>
+    } else {
+      return <Typography>Score: {score}</Typography>
+    }
+  }
+
   return (
     <Paper>
       <Grid container>
@@ -113,15 +144,7 @@ function Quiz({mode, options, onQuit}: QuizProps) {
           <Typography variant="h4">Score:{score}</Typography>
         </Grid>
         <Grid item xs={4}>
-          <CountdownCircleTimer
-            size={90}
-            isPlaying
-            duration={options.timeLimit * 60}
-            colors={['#32a852', '#fff824', '#f70000']}
-            colorsTime={[options.timeLimit * 60, options.timeLimit * 30, 0]}          
-          >
-            {renderTime}
-          </CountdownCircleTimer>
+          {renderTimer()}
         </Grid>
         <Grid item xs={12}>
           {!lost ?
@@ -130,7 +153,11 @@ function Quiz({mode, options, onQuit}: QuizProps) {
                         onRightAnswer={onRightAnswer}
                         onWrongAnswer={onWrongAnswer} 
                         key={questionKey}/> :
-              <Button variant="contained" onClick={restartClick}>Recommencez?</Button>
+              <>
+                <Typography>Partie terminée!</Typography>
+                {gameSummary()}
+                <Button variant="contained" onClick={restartClick}>Nouvelle partie?</Button>
+              </>
           }    
         </Grid>        
       </Grid>

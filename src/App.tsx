@@ -20,6 +20,7 @@ function App() {
   const [quizKey, setQuizKey] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [options, setOptions] = useState(defaultGameOptions);
+  const [mode, setMode] = useState("suddenDeath");
 
   const initializeGame = () => {
     setStarted(true)
@@ -31,6 +32,7 @@ function App() {
   }
 
   const onModeSelect = (mode:string) => {
+    setMode(mode)
     initializeGame()
   }
 
@@ -56,7 +58,7 @@ function App() {
       <Container>
         {!started ?
           <ModeSelect onSelect={onModeSelect}/> :
-          <Quiz mode="suddenDeath" options={options} onQuit={onQuit} key={quizKey}/>
+          <Quiz mode={mode} options={options} onQuit={onQuit} key={quizKey}/>
         }        
       </Container>
     </div>
