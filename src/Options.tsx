@@ -18,7 +18,8 @@ type GameOptions = {
   useTables: boolean,
   tables: Array<number>,
   timeLimit: number,
-  excludeZeroAndOne: boolean
+  excludeZeroAndOne: boolean,
+  multipleChoices: boolean
 }
 
 const defaultGameOptions: GameOptions = {
@@ -27,7 +28,8 @@ const defaultGameOptions: GameOptions = {
   useTables: true,
   tables: [2, 3, 5, 10],
   timeLimit: 1,
-  excludeZeroAndOne: true
+  excludeZeroAndOne: true,
+  multipleChoices: false
 }
 
 type MinMaxProps = {
@@ -122,6 +124,12 @@ function Options({options, onChange} : OptionsProps) {
     }
   }
 
+  const handleMultipleChoicesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newOptions = {...options}
+    newOptions.multipleChoices = event.target.checked;
+    onChange(newOptions)
+  }  
+
   return(
     <>
       <Button onClick={handleClickOpen} color="inherit" size="large">
@@ -131,6 +139,7 @@ function Options({options, onChange} : OptionsProps) {
         <DialogTitle>Options</DialogTitle>
         <DialogContent>
           <MinAndMax min={options.minNumber} max={options.maxNumber} onChange={onChangeMinMax} />
+          <FormControlLabel control={<Switch checked={options.multipleChoices} onChange={handleMultipleChoicesChange} />} label="Questions à choix multiples" />
           <FormControlLabel control={<Switch checked={!options.excludeZeroAndOne} onChange={handleIncludeZeroAndOneChange} />} label="Inclure les multiplications par zéro et par un" />
           <FormControlLabel control={<Switch checked={options.useTables} onChange={handleUseTableChange} />} label="Utiliser les tables" />
           <FormGroup row>
