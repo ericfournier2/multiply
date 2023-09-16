@@ -31,7 +31,10 @@ function App() {
     setOptions(options);
   }
 
-  const onModeSelect = (mode:string) => {
+  const onModeSelect = (mode:string, options?: GameOptions) => {
+    if(options) {
+      setOptions(options)
+    }
     setMode(mode)
     initializeGame()
   }
