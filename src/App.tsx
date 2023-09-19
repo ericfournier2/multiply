@@ -10,10 +10,14 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import './App.css';
 
+import useLocalStorage from './Storage'
 import { Options, defaultGameOptions } from './Options';
 import ModeSelect from './ModeSelect';
 import type { GameOptions } from './Options';
 import Quiz from './Quiz';
+import type { Profile } from './Profiles';
+import Profiles from './Profiles';
+
 
 function App() {
   const [started, setStarted] = useState(false);
@@ -21,6 +25,8 @@ function App() {
   const [highScore, setHighScore] = useState(0);
   const [options, setOptions] = useState(defaultGameOptions);
   const [mode, setMode] = useState("suddenDeath");
+  const [profiles, setProfiles] = useLocalStorage("profiles", []);
+  // const [activeProfile, setActiveProfile] = useState(profiles.length > 0 ? profiles[0] : undefined)
 
   const initializeGame = () => {
     setStarted(true)
@@ -46,6 +52,10 @@ function App() {
     initializeGame();
   }
 
+  const onProfilesChange = (profiles: Array<Profile>) => {
+    setProfiles(profiles)
+  }
+
   return (
     <div className="App">
       <AppBar>
@@ -56,6 +66,7 @@ function App() {
           </Typography>
           <Typography>Plus haut score:{highScore}</Typography>
         </Toolbar>
+        <Profiles profiles={profiles} onChange={onProfilesChange} />
       </AppBar>
       <Toolbar />
       <Container>
