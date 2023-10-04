@@ -86,19 +86,24 @@ function Profiles({profiles, onChange}: ProfileProps) {
     onChange(newProfiles)
   }
 
-  const switchProfile = (name: string) => {
+  const switchProfile = (name: string) => () => {
+    console.log("switchProfile:", name)
     const newProfiles = profiles.map((x) => {x.active = false; return x;});
     const index = newProfiles.findIndex((x) => x.name===name)
     newProfiles[index].active = true;
+    console.log(newProfiles)
 
     onChange(newProfiles);
   }
+
+  const activeProfile = profiles.find((x) => x.active)
+  const activeName = activeProfile ? activeProfile.name : ""
 
   return (
     <Box sx={{ flexGrow: 0 }}>
     <Tooltip title="Open settings">
       <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-        <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+        <Avatar alt={activeName} src="/static/images/avatar/2.jpg" />
       </IconButton>
     </Tooltip>
     <Menu
@@ -118,7 +123,7 @@ function Profiles({profiles, onChange}: ProfileProps) {
       onClose={handleCloseUserMenu}
     >
       {profiles.map((profile) => (
-        <MenuItem key={profile.name} onClick={handleCloseUserMenu}>
+        <MenuItem key={profile.name} onClick={switchProfile(profile.name)}>
           <Typography textAlign="center">{profile.name}</Typography>
         </MenuItem>
       ))}

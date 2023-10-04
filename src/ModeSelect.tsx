@@ -55,6 +55,38 @@ const examsDefinitions = [
       multipleChoices: false
     }
   },    
+  {
+    label: "Ceinture mauve",
+    desc: "Pratique pour ta ceinture mauve!",
+    icon: "belt.svg",
+    mode: "timeLimit",
+    threshold: 20,    
+    options: {
+      minNumber: 2,
+      maxNumber: 10,
+      useTables: true,
+      tables: [2, 3, 4, 5, 6, 10],
+      timeLimit: 1,
+      excludeZeroAndOne: true,
+      multipleChoices: false
+    }
+  },    
+  {
+    label: "Ceinture bleue",
+    desc: "Pratique pour ta ceinture bleue!",
+    icon: "belt.svg",
+    mode: "timeLimit",
+    threshold: 20,    
+    options: {
+      minNumber: 2,
+      maxNumber: 10,
+      useTables: true,
+      tables: [2, 3, 4, 5, 6, 7, 10],
+      timeLimit: 1,
+      excludeZeroAndOne: true,
+      multipleChoices: false
+    }
+  },  
 ]
 
 type ModeButtonProps = {

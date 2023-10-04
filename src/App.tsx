@@ -65,8 +65,8 @@ function App() {
             Multiplicathlon!
           </Typography>
           <Typography>Plus haut score:{highScore}</Typography>
+          <Profiles profiles={profiles} onChange={onProfilesChange} />
         </Toolbar>
-        <Profiles profiles={profiles} onChange={onProfilesChange} />
       </AppBar>
       <Toolbar />
       <Container>
