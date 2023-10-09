@@ -31,7 +31,7 @@ function AddProfileModal({onNewProfile} : AddProfileModalProps) {
   }
 
   const onCreate = () => {
-    onNewProfile({name: name, active: false})
+    onNewProfile({name: name, active: false, stats: {exams: []} })
     setOpen(false)
   }
 
@@ -58,10 +58,20 @@ function AddProfileModal({onNewProfile} : AddProfileModalProps) {
   );
 }
 
+type ExamResults = {
+  id: string,
+  passed: boolean,
+  score: number
+}
+
+type Stats = {
+  exams: Array<ExamResults>
+}
 
 type Profile = {
   name: string,
-  active: boolean
+  active: boolean,
+  stats: Stats
 }
 
 type ProfileProps = {
@@ -87,11 +97,9 @@ function Profiles({profiles, onChange}: ProfileProps) {
   }
 
   const switchProfile = (name: string) => () => {
-    console.log("switchProfile:", name)
     const newProfiles = profiles.map((x) => {x.active = false; return x;});
     const index = newProfiles.findIndex((x) => x.name===name)
     newProfiles[index].active = true;
-    console.log(newProfiles)
 
     onChange(newProfiles);
   }
@@ -133,5 +141,5 @@ function Profiles({profiles, onChange}: ProfileProps) {
   );
 }
 
-export type {Profile};
+export type {Profile, ExamResults, Stats};
 export default Profiles;

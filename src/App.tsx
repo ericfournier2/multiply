@@ -15,16 +15,15 @@ import { Options, defaultGameOptions } from './Options';
 import ModeSelect from './ModeSelect';
 import type { GameOptions } from './Options';
 import Quiz from './Quiz';
-import type { Profile } from './Profiles';
+import type { Profile, ExamResults } from './Profiles';
 import Profiles from './Profiles';
 
 
 function App() {
   const [started, setStarted] = useState(false);
   const [quizKey, setQuizKey] = useState(0);
-  const [highScore, setHighScore] = useState(0);
   const [options, setOptions] = useState(defaultGameOptions);
-  const [mode, setMode] = useState("suddenDeath");
+  const [id, setId] = useState("timeLimitPractice");
   const [profiles, setProfiles] = useLocalStorage("profiles", []);
   // const [activeProfile, setActiveProfile] = useState(profiles.length > 0 ? profiles[0] : undefined)
 
@@ -37,18 +36,15 @@ function App() {
     setOptions(options);
   }
 
-  const onModeSelect = (mode:string, options?: GameOptions) => {
+  const onModeSelect = (id:string, options?: GameOptions) => {
     if(options) {
       setOptions(options)
     }
-    setMode(mode)
+    setId(id)
     initializeGame()
   }
 
-  const onQuit = (score: number) => {
-    if(score > highScore) {
-      setHighScore(score)
-    }
+  const onQuit = (results: ExamResults) => {
     initializeGame();
   }
 
@@ -64,7 +60,6 @@ function App() {
           <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
             Multiplicathlon!
           </Typography>
-          <Typography>Plus haut score:{highScore}</Typography>
           <Profiles profiles={profiles} onChange={onProfilesChange} />
         </Toolbar>
       </AppBar>
@@ -72,7 +67,7 @@ function App() {
       <Container>
         {!started ?
           <ModeSelect onSelect={onModeSelect}/> :
-          <Quiz mode={mode} options={options} onQuit={onQuit} key={quizKey}/>
+          <Quiz id={id} options={options} onQuit={onQuit} key={quizKey}/>
         }        
       </Container>
     </div>

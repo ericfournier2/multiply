@@ -12,24 +12,36 @@ import Checkbox from '@mui/material/Checkbox';
 import Switch from '@mui/material/Switch';
 import Stack from '@mui/material/Stack';
 
+enum GameType {
+  "TimeLimit",
+  "SuddenDeath",
+  "Endless"
+}
+
 type GameOptions = {
+  mode: GameType,
   minNumber: number,
   maxNumber: number,
   useTables: boolean,
   tables: Array<number>,
   timeLimit: number,
   excludeZeroAndOne: boolean,
-  multipleChoices: boolean
+  multipleChoices: boolean,
+  nQuestions: number,
+  threshold: number
 }
 
 const defaultGameOptions: GameOptions = {
+  mode: GameType.TimeLimit,
   minNumber: 2,
   maxNumber: 10,
   useTables: true,
   tables: [2, 3, 5, 10],
   timeLimit: 1,
   excludeZeroAndOne: true,
-  multipleChoices: false
+  multipleChoices: false,
+  nQuestions: 20,
+  threshold: 18
 }
 
 type MinMaxProps = {
@@ -155,5 +167,5 @@ function Options({options, onChange} : OptionsProps) {
   );
 }
 
-export {Options, defaultGameOptions};
+export {Options, defaultGameOptions, GameType};
 export type {GameOptions};
