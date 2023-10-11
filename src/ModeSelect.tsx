@@ -4,8 +4,12 @@ import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
+import Badge from '@mui/material/Badge';
+import CheckIcon from '@mui/icons-material/Check';
+
 import { GameType, defaultGameOptions } from './Options';
 import type { GameOptions } from './Options';
+import type {Stats} from "./Profiles";
 
 const examsDefinitions = [
   {
@@ -101,6 +105,7 @@ const examsDefinitions = [
 ]
 
 type ModeButtonProps = {
+  passed?: boolean,
   title: string,
   description: string,
   icon: string,
@@ -108,12 +113,12 @@ type ModeButtonProps = {
   disabled?: boolean
 }
 
-function ModeButton({title, description, icon, onClick, disabled=false}: ModeButtonProps) {
+function ModeButton({passed, title, description, icon, onClick, disabled=false}: ModeButtonProps) {
   return(
-    <Grid item xs={4}>
+   <Grid item xs={4}>
     <Card>
       <CardContent>
-        <Typography variant="h5" sx={{backgroundColor:"lightgrey"}}>{title}</Typography>
+        <Typography variant="h5" sx={{backgroundColor:"lightgrey"}}>{title} {passed ? <CheckIcon color="success" /> : ""}</Typography> 
         <img src={icon} width="90%" />
         <Typography variant="body1">{description}</Typography>
       </CardContent>
@@ -122,11 +127,13 @@ function ModeButton({title, description, icon, onClick, disabled=false}: ModeBut
       </CardActions>
     </Card>
   </Grid>
+
   );
 }
 
 type ModeSelectProps = {
   onSelect: (id: string, options?: GameOptions) => void,
+  stats?: Stats
 }
 
 const timeLimitOptions = {...defaultGameOptions};
@@ -135,10 +142,10 @@ timeLimitOptions.mode = GameType.TimeLimit;
 const suddenDeathOptions = {...defaultGameOptions};
 suddenDeathOptions.mode = GameType.SuddenDeath;
 
-function ModeSelect({onSelect}: ModeSelectProps) {
+function ModeSelect({onSelect, stats}: ModeSelectProps) {
   const modeSelectCallback = (id: string, options?: GameOptions) => () => onSelect(id, options);
 
-  const exams = examsDefinitions.map((x) => <ModeButton icon={x.icon} title={x.label} description={x.desc} onClick={modeSelectCallback(x.id, x.options)} key={"exam_" + x.label}/>)
+  const exams = examsDefinitions.map((x) => <ModeButton passed={stats ? stats.exams.some((y) => ((y.id === x.id) && y.passed)) : false} icon={x.icon} title={x.label} description={x.desc} onClick={modeSelectCallback(x.id, x.options)} key={"exam_" + x.label}/>)
 
   return(
     <Grid container spacing={4}>

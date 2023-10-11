@@ -98,7 +98,6 @@ const AnswerField = ({firstNumber, secondNumber, onRightAnswer, onWrongAnswer} :
   }
 
   const handleTextKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    console.log(event)
     if((event.key === "Enter") && (text !== "")) {
       if(parseInt(text) === (firstNumber * secondNumber)) {
         onRightAnswer()

@@ -19,6 +19,10 @@ import type { Profile, ExamResults } from './Profiles';
 import Profiles from './Profiles';
 
 
+function getActiveProfile(profiles: Array<Profile>) {
+  return profiles.find((x) => x.active)
+}
+
 function App() {
   const [started, setStarted] = useState(false);
   const [quizKey, setQuizKey] = useState(0);
@@ -45,6 +49,24 @@ function App() {
   }
 
   const onQuit = (results: ExamResults) => {
+    const newProfiles = [...profiles]
+    const activeProfile = getActiveProfile(newProfiles) as Profile;
+    if(activeProfile) {
+      const examStat = activeProfile.stats.exams.find((x) => x.id === results.id)
+      if(examStat) {
+        if(!examStat.passed && results.passed) {
+          examStat.passed = true;
+        }
+
+        if(examStat.score < results.score) {
+          examStat.score = results.score
+        }
+      } else {
+        activeProfile.stats.exams.push(results)
+      }
+
+      setProfiles(newProfiles)
+    }
     initializeGame();
   }
 
@@ -66,7 +88,7 @@ function App() {
       <Toolbar />
       <Container>
         {!started ?
-          <ModeSelect onSelect={onModeSelect}/> :
+          <ModeSelect stats={getActiveProfile(profiles)?.stats}  onSelect={onModeSelect}/> :
           <Quiz id={id} options={options} onQuit={onQuit} key={quizKey}/>
         }        
       </Container>
