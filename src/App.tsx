@@ -48,26 +48,29 @@ function App() {
     initializeGame()
   }
 
-  const onQuit = (results: ExamResults) => {
-    const newProfiles = [...profiles]
-    const activeProfile = getActiveProfile(newProfiles) as Profile;
-    if(activeProfile) {
-      const examStat = activeProfile.stats.exams.find((x) => x.id === results.id)
-      if(examStat) {
-        if(!examStat.passed && results.passed) {
-          examStat.passed = true;
+  const onQuit = (results?: ExamResults) => {
+    if(results) {
+      const newProfiles = [...profiles]
+      const activeProfile = getActiveProfile(newProfiles) as Profile;
+      if(activeProfile) {
+        const examStat = activeProfile.stats.exams.find((x) => x.id === results.id)
+        if(examStat) {
+          if(!examStat.passed && results.passed) {
+            examStat.passed = true;
+          }
+
+          if(examStat.score < results.score) {
+            examStat.score = results.score
+          }
+        } else {
+          activeProfile.stats.exams.push(results)
         }
 
-        if(examStat.score < results.score) {
-          examStat.score = results.score
-        }
-      } else {
-        activeProfile.stats.exams.push(results)
+        setProfiles(newProfiles)
       }
-
-      setProfiles(newProfiles)
     }
-    initializeGame();
+
+    setStarted(false);
   }
 
   const onProfilesChange = (profiles: Array<Profile>) => {

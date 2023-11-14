@@ -17,7 +17,7 @@ import type { ExamResults } from "./Profiles";
 type QuizProps = {
   id: string,
   options: GameOptions,
-  onQuit: (results: ExamResults) => void
+  onQuit: (results?: ExamResults) => void
 }
 
 function pickNumbers(options: GameOptions) {
@@ -168,12 +168,15 @@ function Quiz({id, options, onQuit}: QuizProps) {
   return (
     <Paper>
       <Grid container>
-        <Grid item xs={8}>
+        <Grid item xs={6}>
           <Typography variant="h4">Score:{score}</Typography>
         </Grid>
         <Grid item xs={4}>
           {renderTimer()}
         </Grid>
+        <Grid item xs={2}>
+        <Button variant="contained" onClick={() => { onQuit(undefined) }}>X</Button>
+        </Grid>        
         <Grid item xs={12}>
           {!lost ?
               <Question type={options.multiplicationOptions ? QuestionType.Multiplication : QuestionType.Division}
@@ -186,7 +189,7 @@ function Quiz({id, options, onQuit}: QuizProps) {
               <>
                 <Typography>Partie terminée!</Typography>
                 {gameSummary()}
-                <Button variant="contained" onClick={restartClick}>Nouvelle partie?</Button>
+                <Button variant="contained" onClick={restartClick}>Retour au menu?</Button>
               </>
           }    
         </Grid>        
