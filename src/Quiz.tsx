@@ -11,7 +11,7 @@ import Grid from '@mui/material/Grid';
 import { randomIntegerInRange } from './Utils';
 import type { GameOptions } from './Options';
 import { GameType } from './Options';
-import { Question } from "./Question";
+import { Question, QuestionType } from "./Question";
 import type { ExamResults } from "./Profiles";
 
 type QuizProps = {
@@ -24,19 +24,32 @@ function pickNumbers(options: GameOptions) {
   let n1 = 0;
   let n2 = 0;
   
-  if(!options.useTables) {
-    n1 = randomIntegerInRange(options.minNumber, options.maxNumber);
-    n2 = randomIntegerInRange(options.minNumber, options.maxNumber);
-  } else {
-    n1 = options.tables[randomIntegerInRange(0, options.tables.length)];
-    if(options.excludeZeroAndOne) {
-      n2 = randomIntegerInRange(2, options.maxNumber);
+  if(options.multiplicationOptions) {
+    if(!options.multiplicationOptions.useTables) {
+      n1 = randomIntegerInRange(options.multiplicationOptions.minNumber, options.multiplicationOptions.maxNumber);
+      n2 = randomIntegerInRange(options.multiplicationOptions.minNumber, options.multiplicationOptions.maxNumber);
     } else {
-      n2 = randomIntegerInRange(0, options.maxNumber);
+      n1 = options.multiplicationOptions.tables[randomIntegerInRange(0, options.multiplicationOptions.tables.length)];
+      if(options.multiplicationOptions.excludeZeroAndOne) {
+        n2 = randomIntegerInRange(2, options.multiplicationOptions.maxNumber);
+      } else {
+        n2 = randomIntegerInRange(0, options.multiplicationOptions.maxNumber);
+      }
     }
-  }
 
-  return {n1:n1, n2:n2}
+    return {n1:n1, n2:n2}
+  } else if(options.divisionOptions) {
+    n1 = options.divisionOptions.tables[randomIntegerInRange(0, options.divisionOptions.tables.length)];
+    if(options.divisionOptions.excludeOne) {
+      n2 = randomIntegerInRange(2, options.divisionOptions.maxNumber);
+    } else {
+      n2 = randomIntegerInRange(1, options.divisionOptions.maxNumber);
+    }    
+
+    return {n1: n1 * n2, n2: n2}
+  } else {
+    return {n1: 1, n2: 1}
+  }
 }
 
 function scorePercent(score: number, wrongAnswers: number) {
@@ -163,7 +176,8 @@ function Quiz({id, options, onQuit}: QuizProps) {
         </Grid>
         <Grid item xs={12}>
           {!lost ?
-              <Question firstNumber={firstNumber} 
+              <Question type={options.multiplicationOptions ? QuestionType.Multiplication : QuestionType.Division}
+                        firstNumber={firstNumber} 
                         secondNumber={secondNumber} 
                         onRightAnswer={onRightAnswer}
                         onWrongAnswer={onWrongAnswer} 

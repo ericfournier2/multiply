@@ -18,30 +18,52 @@ enum GameType {
   "Endless"
 }
 
-type GameOptions = {
-  mode: GameType,
+type MultiplicationOptions = {
   minNumber: number,
   maxNumber: number,
   useTables: boolean,
   tables: Array<number>,
-  timeLimit: number,
-  excludeZeroAndOne: boolean,
-  multipleChoices: boolean,
-  nQuestions: number,
-  threshold: number
+  excludeZeroAndOne: boolean,  
 }
 
-const defaultGameOptions: GameOptions = {
-  mode: GameType.TimeLimit,
+type DivisionOptions = {
+  maxNumber: number,  
+  tables: Array<number>,
+  excludeOne: boolean, 
+}
+
+type GameOptions = {
+  mode: GameType,
+  timeLimit: number,
+  multipleChoices: boolean,
+  nQuestions: number,
+  threshold: number,
+  multiplicationOptions?: MultiplicationOptions,
+  divisionOptions?: DivisionOptions
+}
+
+const defaultMultiplicationOptions : MultiplicationOptions = {
   minNumber: 2,
   maxNumber: 10,
   useTables: true,
   tables: [2, 3, 5, 10],
+  excludeZeroAndOne: true,  
+}
+
+const defaultDivisionOptions : DivisionOptions = {
+  maxNumber: 10,
+  tables: [2, 3, 5, 10],
+  excludeOne: true,  
+}
+
+const defaultGameOptions: GameOptions = {
+  mode: GameType.TimeLimit,
   timeLimit: 1,
-  excludeZeroAndOne: true,
   multipleChoices: false,
   nQuestions: 20,
-  threshold: 18
+  threshold: 18,
+  multiplicationOptions: defaultMultiplicationOptions,
+  divisionOptions: defaultDivisionOptions
 }
 
 type MinMaxProps = {
@@ -83,9 +105,11 @@ function Options({options, onChange} : OptionsProps) {
 
   const onChangeMinMax = (min: number, max: number) => {
     const newOptions = {...options}
-    newOptions.minNumber = min;
-    newOptions.maxNumber = max;
-    onChange(newOptions)
+    if(newOptions.multiplicationOptions) {
+      newOptions.multiplicationOptions.minNumber = min;
+      newOptions.multiplicationOptions.maxNumber = max;
+      onChange(newOptions)
+    }
   }
 
   const handleTableChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,20 +118,22 @@ function Options({options, onChange} : OptionsProps) {
       const tableNumber = parseInt(tableNumberStr)
 
       const newOptions = {...options}
-      if(event.target.checked && !newOptions.tables.includes(tableNumber)) {
-        newOptions.tables.push(tableNumber)
-        onChange(newOptions)
-      } else if(!event.target.checked && newOptions.tables.includes(tableNumber)) {
-        newOptions.tables = newOptions.tables.filter((x) => x != tableNumber)
-        onChange(newOptions)
+      if(newOptions.multiplicationOptions) {
+        if(event.target.checked && !newOptions.multiplicationOptions.tables.includes(tableNumber)) {
+          newOptions.multiplicationOptions.tables.push(tableNumber)
+          onChange(newOptions)
+        } else if(!event.target.checked && newOptions.multiplicationOptions.tables.includes(tableNumber)) {
+          newOptions.multiplicationOptions.tables = newOptions.multiplicationOptions.tables.filter((x) => x != tableNumber)
+          onChange(newOptions)
+        }
       }
     }
   };
 
   const tableCheckboxes = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((x) => <FormControlLabel
     control={
-      <Checkbox disabled={!options.useTables} 
-                checked={options.tables.includes(x)} 
+      <Checkbox disabled={!options.multiplicationOptions || ! options.multiplicationOptions.useTables} 
+                checked={options.multiplicationOptions ? options.multiplicationOptions.tables.includes(x) : false} 
                 onChange={handleTableChange} 
                 name={"tablecheckbox_" + x} />
     }
@@ -117,14 +143,18 @@ function Options({options, onChange} : OptionsProps) {
 
   const handleUseTableChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newOptions = {...options}
-    newOptions.useTables = event.target.checked;
-    onChange(newOptions)
+    if(newOptions.multiplicationOptions) {
+      newOptions.multiplicationOptions.useTables = event.target.checked;
+      onChange(newOptions)
+    }
   }
 
   const handleIncludeZeroAndOneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newOptions = {...options}
-    newOptions.excludeZeroAndOne = !event.target.checked;
-    onChange(newOptions)
+    if(newOptions.multiplicationOptions) {
+      newOptions.multiplicationOptions.excludeZeroAndOne = !event.target.checked;
+      onChange(newOptions)
+    }
   }
 
   const handleTimeLimitChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -150,10 +180,10 @@ function Options({options, onChange} : OptionsProps) {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Options</DialogTitle>
         <DialogContent>
-          <MinAndMax min={options.minNumber} max={options.maxNumber} onChange={onChangeMinMax} />
+          <MinAndMax min={options.multiplicationOptions ? options.multiplicationOptions.minNumber : 1} max={options.multiplicationOptions ? options.multiplicationOptions.maxNumber : 1} onChange={onChangeMinMax} />
           <FormControlLabel control={<Switch checked={options.multipleChoices} onChange={handleMultipleChoicesChange} />} label="Questions à choix multiples" />
-          <FormControlLabel control={<Switch checked={!options.excludeZeroAndOne} onChange={handleIncludeZeroAndOneChange} />} label="Inclure les multiplications par zéro et par un" />
-          <FormControlLabel control={<Switch checked={options.useTables} onChange={handleUseTableChange} />} label="Utiliser les tables" />
+          <FormControlLabel control={<Switch checked={options.multiplicationOptions ? !options.multiplicationOptions.excludeZeroAndOne : false} onChange={handleIncludeZeroAndOneChange} />} label="Inclure les multiplications par zéro et par un" />
+          <FormControlLabel control={<Switch checked={options.multiplicationOptions ? options.multiplicationOptions.useTables : false} onChange={handleUseTableChange} />} label="Utiliser les tables" />
           <FormGroup row>
             {tableCheckboxes}
           </FormGroup>
@@ -168,4 +198,4 @@ function Options({options, onChange} : OptionsProps) {
 }
 
 export {Options, defaultGameOptions, GameType};
-export type {GameOptions};
+export type {GameOptions, MultiplicationOptions, DivisionOptions};

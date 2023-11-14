@@ -11,97 +11,112 @@ import { GameType, defaultGameOptions } from './Options';
 import type { GameOptions } from './Options';
 import type {Stats} from "./Profiles";
 
+const defaultBeltOptions = {...defaultGameOptions}
+defaultBeltOptions.multiplicationOptions = undefined;
+defaultBeltOptions.divisionOptions = undefined;
+
+const defaultMultOptions = {  
+  minNumber: 2,
+  maxNumber: 10,
+  useTables: true,
+  tables: [2, 3, 5, 10],
+  excludeZeroAndOne: true,  
+}
+
+const defaultDivOptions = {
+  maxNumber: 10,
+  tables: [2, 3, 5, 10],
+  excludeOne: true,    
+}
+
+function makeBeltOptions(multTables?: Array<number>, divTables?: Array<number>) {
+  const beltOptions = {...defaultBeltOptions}
+  if(multTables) {
+    const multOptions = {...defaultMultOptions}
+    multOptions.tables = multTables;
+    beltOptions.multiplicationOptions = multOptions;
+  }
+
+  if(divTables) {
+    const divOptions = {...defaultDivOptions}
+    divOptions.tables = divTables;
+    beltOptions.divisionOptions = divOptions
+  }
+
+  return beltOptions;
+}
+
 const examsDefinitions = [
   {
     id: "BELT_1",
     label: "Ceinture blanche",
     desc: "Pratique pour ta ceinture blanche!",
     icon: "belt.svg",
-    options: {
-      mode: GameType.TimeLimit,
-      minNumber: 2,
-      maxNumber: 10,
-      useTables: true,
-      tables: [2, 3],
-      timeLimit: 1,
-      excludeZeroAndOne: true,
-      multipleChoices: false,
-      threshold: 18,
-      nQuestions: 20
-    }
+    options: makeBeltOptions([2,3], undefined)
   },
   {
     id: "BELT_2",    
     label: "Ceinture jaune",
     desc: "Pratique pour ta ceinture jaune!",
     icon: "belt.svg",
-    options: {
-      mode: GameType.TimeLimit,
-      minNumber: 2,
-      maxNumber: 10,
-      useTables: true,
-      tables: [2, 3, 5, 10],
-      timeLimit: 1,
-      excludeZeroAndOne: true,
-      multipleChoices: false,
-      nQuestions: 20,
-      threshold: 20,    
-    }
+    options: makeBeltOptions([2, 3, 5, 10], undefined)    
   },
   {
     id: "BELT_3",    
     label: "Ceinture orange",
     desc: "Pratique pour ta ceinture orange!",
     icon: "belt.svg",
-    options: {
-      mode: GameType.TimeLimit,
-      minNumber: 2,
-      maxNumber: 10,
-      useTables: true,
-      tables: [2, 3, 4, 5, 10],
-      timeLimit: 1,
-      excludeZeroAndOne: true,
-      multipleChoices: false,
-      nQuestions: 20,
-      threshold: 18,    
-    }
+    options: makeBeltOptions([2, 3, 4, 5, 10], undefined)        
   },    
   {
     id: "BELT_4",    
-    label: "Ceinture mauve",
-    desc: "Pratique pour ta ceinture mauve!",
+    label: "Ceinture vert pâle",
+    desc: "Pratique pour ta ceinture vert pâle!",
     icon: "belt.svg",
-    options: {
-      mode: GameType.TimeLimit,
-      minNumber: 2,
-      maxNumber: 10,
-      useTables: true,
-      tables: [2, 3, 4, 5, 6, 10],
-      timeLimit: 1,
-      excludeZeroAndOne: true,
-      multipleChoices: false,
-      nQuestions: 20,
-      threshold: 18,    
-    }
+    options: makeBeltOptions([2, 3, 4, 5, 6, 10], undefined)            
   },    
   {
     id: "BELT_5",    
-    label: "Ceinture bleue",
-    desc: "Pratique pour ta ceinture bleue!",
+    label: "Ceinture vert forêt",
+    desc: "Pratique pour ta ceinture vert forêt!",
     icon: "belt.svg",
-    options: {
-      mode: GameType.TimeLimit,
-      minNumber: 2,
-      maxNumber: 10,
-      useTables: true,
-      tables: [2, 3, 4, 5, 6, 7, 10],
-      timeLimit: 1,
-      excludeZeroAndOne: true,
-      multipleChoices: false,
-      nQuestions: 20,          
-      threshold: 18
-    }
+    options: makeBeltOptions([2, 3, 4, 5, 6, 7, 10], undefined)     
   },  
+  {
+    id: "BELT_6",    
+    label: "Ceinture bleu pâle",
+    desc: "Pratique pour ta ceinture bleue pâle!",
+    icon: "belt.svg",
+    options: makeBeltOptions([2, 3, 4, 5, 6, 7, 8, 10], undefined)     
+  },   
+  {
+    id: "BELT_7",    
+    label: "Ceinture bleu foncé",
+    desc: "Pratique pour ta ceinture bleue foncé!",
+    icon: "belt.svg",
+    options: makeBeltOptions([2, 3, 4, 5, 6, 7, 8, 9, 10], undefined)     
+  },   
+  {
+    id: "BELT_8",    
+    label: "Ceinture rose",
+    desc: "Pratique pour ta ceinture rose!",
+    icon: "belt.svg",
+    options: makeBeltOptions(undefined, [2, 3, 4, 5, 6])     
+  },   
+  {
+    id: "BELT_9",    
+    label: "Ceinture rouge",
+    desc: "Pratique pour ta ceinture rouge!",
+    icon: "belt.svg",
+    options: makeBeltOptions(undefined, [2, 3, 4, 5, 6, 7, 8, 9, 10])     
+  },       
+  {
+    id: "BELT_10",    
+    label: "Ceinture noise",
+    desc: "Pratique pour ta ceinture noire!",
+    icon: "belt.svg",
+    options: makeBeltOptions([2, 3, 4, 5, 6, 7, 8, 9, 10], [2, 3, 4, 5, 6, 7, 8, 9, 10])     
+  },      
 ]
 
 type ModeButtonProps = {
