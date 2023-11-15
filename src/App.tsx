@@ -11,9 +11,10 @@ import '@fontsource/roboto/700.css';
 import './App.css';
 
 import useLocalStorage from './Storage'
-import { Options, defaultGameOptions } from './Options';
+import { Options } from './Options';
+import { defaultGameOptions} from './Modes';
 import ModeSelect from './ModeSelect';
-import type { GameOptions } from './Options';
+import type { GameOptions } from './Modes';
 import Quiz from './Quiz';
 import type { Profile, ExamResults } from './Profiles';
 import Profiles from './Profiles';

@@ -9,8 +9,8 @@ import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 
 import { randomIntegerInRange } from './Utils';
-import type { GameOptions } from './Options';
-import { GameType } from './Options';
+import type { GameOptions } from './Modes';
+import { GameType } from './Modes';
 import { Question, QuestionType } from "./Question";
 import type { ExamResults } from "./Profiles";
 
@@ -74,11 +74,11 @@ function Quiz({id, options, onQuit}: QuizProps) {
 
   // Set up the timer.
   const expiryTimestamp = new Date();
-  expiryTimestamp.setSeconds(expiryTimestamp.getSeconds() + (options.timeLimit * 60))
+  expiryTimestamp.setSeconds(expiryTimestamp.getSeconds() + (options.quizOptions.timeLimit * 60))
   const [timerExpiry, setTimerExpiry] = useState(expiryTimestamp);
 
   const onTimerExpire = () => {
-    if(options.mode == GameType.TimeLimit) {
+    if(options.quizOptions.mode == GameType.TimeLimit) {
       setLost(true);
     }
   }
@@ -112,7 +112,7 @@ function Quiz({id, options, onQuit}: QuizProps) {
 
   const onWrongAnswer = () => {
     setWrongAnswers(wrongAnswers + 1)
-    if(options.mode == GameType.SuddenDeath) {
+    if(options.quizOptions.mode == GameType.SuddenDeath) {
       setLost(true)
     } else {
       initializeMultiplication()      
@@ -122,7 +122,7 @@ function Quiz({id, options, onQuit}: QuizProps) {
   const restartClick = () => {
     const results = {
       score: scorePercent(score, wrongAnswers),
-      passed: score > options.threshold,
+      passed: score > options.quizOptions.threshold,
       id: id
     }
     onQuit(results)
@@ -142,13 +142,13 @@ function Quiz({id, options, onQuit}: QuizProps) {
   };
 
   const renderTimer = () => {
-    if(options.mode == GameType.TimeLimit) {
+    if(options.quizOptions.mode == GameType.TimeLimit) {
       return <CountdownCircleTimer
         size={90}
         isPlaying
-        duration={options.timeLimit * 60}
+        duration={options.quizOptions.timeLimit * 60}
         colors={['#32a852', '#fff824', '#f70000']}
-        colorsTime={[options.timeLimit * 60, options.timeLimit * 30, 0]}          
+        colorsTime={[options.quizOptions.timeLimit * 60, options.quizOptions.timeLimit * 30, 0]}          
       >
         {renderTime}
       </CountdownCircleTimer>
@@ -158,7 +158,7 @@ function Quiz({id, options, onQuit}: QuizProps) {
   }
 
   const gameSummary = () => {
-    if(options.mode == GameType.TimeLimit) {    
+    if(options.quizOptions.mode == GameType.TimeLimit) {    
       return <Typography>Résultats: {scorePercentString(score, wrongAnswers)}</Typography>
     } else {
       return <Typography>Score: {score}</Typography>
@@ -184,7 +184,7 @@ function Quiz({id, options, onQuit}: QuizProps) {
                         secondNumber={secondNumber} 
                         onRightAnswer={onRightAnswer}
                         onWrongAnswer={onWrongAnswer} 
-                        multipleChoices={options.multipleChoices}
+                        multipleChoices={options.quizOptions.multipleChoices}
                         key={questionKey}/> :
               <>
                 <Typography>Partie terminée!</Typography>

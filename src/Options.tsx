@@ -11,60 +11,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Switch from '@mui/material/Switch';
 import Stack from '@mui/material/Stack';
-
-enum GameType {
-  "TimeLimit",
-  "SuddenDeath",
-  "Endless"
-}
-
-type MultiplicationOptions = {
-  minNumber: number,
-  maxNumber: number,
-  useTables: boolean,
-  tables: Array<number>,
-  excludeZeroAndOne: boolean,  
-}
-
-type DivisionOptions = {
-  maxNumber: number,  
-  tables: Array<number>,
-  excludeOne: boolean, 
-}
-
-type GameOptions = {
-  mode: GameType,
-  timeLimit: number,
-  multipleChoices: boolean,
-  nQuestions: number,
-  threshold: number,
-  multiplicationOptions?: MultiplicationOptions,
-  divisionOptions?: DivisionOptions
-}
-
-const defaultMultiplicationOptions : MultiplicationOptions = {
-  minNumber: 2,
-  maxNumber: 10,
-  useTables: true,
-  tables: [2, 3, 5, 10],
-  excludeZeroAndOne: true,  
-}
-
-const defaultDivisionOptions : DivisionOptions = {
-  maxNumber: 10,
-  tables: [2, 3, 5, 10],
-  excludeOne: true,  
-}
-
-const defaultGameOptions: GameOptions = {
-  mode: GameType.TimeLimit,
-  timeLimit: 1,
-  multipleChoices: false,
-  nQuestions: 20,
-  threshold: 18,
-  multiplicationOptions: defaultMultiplicationOptions,
-  divisionOptions: defaultDivisionOptions
-}
+import type { GameOptions } from "./Modes"
 
 type MinMaxProps = {
   min: number, 
@@ -161,14 +108,14 @@ function Options({options, onChange} : OptionsProps) {
     const intValue = parseInt(event.target.value)
     if(intValue) {
       const newOptions = {...options}
-      newOptions.timeLimit = intValue;
+      newOptions.quizOptions.timeLimit = intValue;
       onChange(newOptions)
     }
   }
 
   const handleMultipleChoicesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newOptions = {...options}
-    newOptions.multipleChoices = event.target.checked;
+    newOptions.quizOptions.multipleChoices = event.target.checked;
     onChange(newOptions)
   }  
 
@@ -181,13 +128,13 @@ function Options({options, onChange} : OptionsProps) {
         <DialogTitle>Options</DialogTitle>
         <DialogContent>
           <MinAndMax min={options.multiplicationOptions ? options.multiplicationOptions.minNumber : 1} max={options.multiplicationOptions ? options.multiplicationOptions.maxNumber : 1} onChange={onChangeMinMax} />
-          <FormControlLabel control={<Switch checked={options.multipleChoices} onChange={handleMultipleChoicesChange} />} label="Questions à choix multiples" />
+          <FormControlLabel control={<Switch checked={options.quizOptions.multipleChoices} onChange={handleMultipleChoicesChange} />} label="Questions à choix multiples" />
           <FormControlLabel control={<Switch checked={options.multiplicationOptions ? !options.multiplicationOptions.excludeZeroAndOne : false} onChange={handleIncludeZeroAndOneChange} />} label="Inclure les multiplications par zéro et par un" />
           <FormControlLabel control={<Switch checked={options.multiplicationOptions ? options.multiplicationOptions.useTables : false} onChange={handleUseTableChange} />} label="Utiliser les tables" />
           <FormGroup row>
             {tableCheckboxes}
           </FormGroup>
-          <TextField label="Nombre de minutes" value={options.timeLimit} onChange={handleTimeLimitChange} inputProps={{ pattern: "[0-9]+" }}/>          
+          <TextField label="Nombre de minutes" value={options.quizOptions.timeLimit} onChange={handleTimeLimitChange} inputProps={{ pattern: "[0-9]+" }}/>          
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Appliquer</Button>
@@ -197,5 +144,4 @@ function Options({options, onChange} : OptionsProps) {
   );
 }
 
-export {Options, defaultGameOptions, GameType};
-export type {GameOptions, MultiplicationOptions, DivisionOptions};
+export {Options};
