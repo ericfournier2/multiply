@@ -17,19 +17,15 @@ import { MultiplicationOptionsControl } from './MultiplicationOptions';
 import { DivisionOptionsControl } from './DivisionOptions';
 
 type OptionsProps = {
+  open: boolean,
   options: GameOptions,
-  onChange: (options: GameOptions) => void
+  onChange: (options: GameOptions) => void,
+  onClose: () => void
 }
 
-function Options({options, onChange} : OptionsProps) {
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
+function Options({open, options, onChange, onClose} : OptionsProps) {
   const handleClose = () => {
-    setOpen(false);
+    onClose();
   };
 
   const handleTimeLimitChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,26 +80,21 @@ function Options({options, onChange} : OptionsProps) {
   }
 
   return(
-    <>
-      <Button onClick={handleClickOpen} color="inherit" size="large">
-        <MenuIcon />
-      </Button>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Options</DialogTitle>
-        <DialogContent>
-          <FormControlLabel control={<Switch checked={options.quizOptions.multipleChoices} onChange={handleMultipleChoicesChange} />} label="Questions à choix multiples" />
-          <TextField label="Nombre de minutes" value={options.quizOptions.timeLimit} onChange={handleTimeLimitChange} inputProps={{ pattern: "[0-9]+" }}/>          
-          <FormControlLabel control={<Switch checked={!!options.multiplicationOptions} onChange={enableDisableMultiplications} />} label="Inclure les multiplications" />
-          {options.multiplicationOptions ? <MultiplicationOptionsControl options={options.multiplicationOptions} onChange={handleMultiplicationOptionsChange} /> : "" }
-          <FormControlLabel control={<Switch checked={!!options.divisionOptions} onChange={enableDisableDivisions} />} label="Inclure les divisions" />
-          {options.divisionOptions ? <DivisionOptionsControl options={options.divisionOptions} onChange={handleDivisionOptionsChange} /> : "" }
+    <Dialog open={open} onClose={handleClose}>
+      <DialogTitle>Options</DialogTitle>
+      <DialogContent>
+        <FormControlLabel control={<Switch checked={options.quizOptions.multipleChoices} onChange={handleMultipleChoicesChange} />} label="Questions à choix multiples" />
+        <TextField label="Nombre de minutes" value={options.quizOptions.timeLimit} onChange={handleTimeLimitChange} inputProps={{ pattern: "[0-9]+" }}/>          
+        <FormControlLabel control={<Switch checked={!!options.multiplicationOptions} onChange={enableDisableMultiplications} />} label="Inclure les multiplications" />
+        {options.multiplicationOptions ? <MultiplicationOptionsControl options={options.multiplicationOptions} onChange={handleMultiplicationOptionsChange} /> : "" }
+        <FormControlLabel control={<Switch checked={!!options.divisionOptions} onChange={enableDisableDivisions} />} label="Inclure les divisions" />
+        {options.divisionOptions ? <DivisionOptionsControl options={options.divisionOptions} onChange={handleDivisionOptionsChange} /> : "" }
 
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Appliquer</Button>
-        </DialogActions>
-      </Dialog>
-    </>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>Débuter</Button>
+      </DialogActions>
+    </Dialog>
   );
 }
 

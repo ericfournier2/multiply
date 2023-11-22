@@ -37,10 +37,6 @@ function App() {
     setQuizKey(quizKey + 1)
   }
 
-  const onOptionsChange = (options: GameOptions) => {
-    setOptions(options);
-  }
-
   const onModeSelect = (id:string, options?: GameOptions) => {
     if(options) {
       setOptions(options)
@@ -82,7 +78,6 @@ function App() {
     <div className="App">
       <AppBar>
         <Toolbar>
-          <Options options={options} onChange={onOptionsChange} />
           <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
             Multiplicathlon!
           </Typography>
