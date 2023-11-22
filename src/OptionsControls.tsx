@@ -39,7 +39,7 @@ const TableSelect = ({tables, disabled, onChange}: TableSelectProps) => {
     if(tableNumberStr) {
       const tableNumber = parseInt(tableNumberStr)
 
-      var newTables = {...tables}
+      var newTables = [...tables]
         if(event.target.checked && !tables.includes(tableNumber)) {
           newTables.push(tableNumber)
           onChange(newTables)
