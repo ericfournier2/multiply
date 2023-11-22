@@ -41,13 +41,12 @@ function generateAnswersArray(type: QuestionType, firstNumber: number, secondNum
       candidateError = mathOp(type, firstNumber + randomIntegerInRange(-2, 2), secondNumber + randomIntegerInRange(-2, 2))
     }
 
-    if(candidateError < 0) {
-      candidateError = 0;
+    if(candidateError >= 0 && Math.round(candidateError) == candidateError && Number.isFinite(candidateError)) {
+      if(!answers.includes(candidateError)) {
+        answers.push(candidateError)
+      }
     }
-
-    if(!answers.includes(candidateError)) {
-      answers.push(candidateError)
-    }
+    
     tries++;
   }
 

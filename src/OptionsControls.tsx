@@ -40,13 +40,13 @@ const TableSelect = ({tables, disabled, onChange}: TableSelectProps) => {
       const tableNumber = parseInt(tableNumberStr)
 
       var newTables = [...tables]
-        if(event.target.checked && !tables.includes(tableNumber)) {
-          newTables.push(tableNumber)
-          onChange(newTables)
-        } else if(!event.target.checked && tables.includes(tableNumber)) {
-          newTables = newTables.filter((x) => x != tableNumber)
-          onChange(newTables)
-        }
+      if(event.target.checked && !tables.includes(tableNumber)) {
+        newTables.push(tableNumber)
+        onChange(newTables)
+      } else if(!event.target.checked && tables.includes(tableNumber)) {
+        newTables = newTables.filter((x) => x != tableNumber)
+        onChange(newTables)
+      }
     }
   };
 
