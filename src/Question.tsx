@@ -1,73 +1,21 @@
 import { useState } from 'react';
 import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import {randomInteger, randomIntegerInRange, shuffleArray} from './Utils';
-
-enum QuestionType {
-  "Multiplication",
-  "Division",
-  "Addition",
-  "Subtraction"
-}
-
-function mathOp(type: QuestionType, arg1: number, arg2: number): number {
-  switch(type) {
-    case QuestionType.Multiplication:
-      return arg1 * arg2;
-    case QuestionType.Division:
-      return arg1 / arg2;
-    case QuestionType.Addition:
-      return arg1 + arg2;
-    case QuestionType.Subtraction:
-      return arg1 - arg2;
-    default:
-      return 0;
-  }
-}
-
-function generateAnswersArray(type: QuestionType, firstNumber: number, secondNumber: number, nAnswers: number) {
-  var answers = [mathOp(type, firstNumber, secondNumber)]
-  var tries = 0;
-
-  while(answers.length < nAnswers && tries < 100) {
-    var candidateError = 0;
-    var errorType = randomInteger(2)
-    if(errorType == 0) {
-      candidateError = mathOp(type, firstNumber, secondNumber) + randomIntegerInRange(-3, 3)
-    } else {
-      candidateError = mathOp(type, firstNumber + randomIntegerInRange(-2, 2), secondNumber + randomIntegerInRange(-2, 2))
-    }
-
-    if(candidateError >= 0 && Math.round(candidateError) == candidateError && Number.isFinite(candidateError)) {
-      if(!answers.includes(candidateError)) {
-        answers.push(candidateError)
-      }
-    }
-    
-    tries++;
-  }
-
-  shuffleArray(answers)
-
-  return answers;
-}
+import { OperationType } from './QuizGenerator';
+import type { MathQuestion } from './QuizGenerator';
 
 type AnswerButtonProps = {
-  type: QuestionType,
   answer: number,
-  firstNumber: number,
-  secondNumber: number,
+  correctAnswer: number,
   onRightAnswer: () => void,
   onWrongAnswer: () => void
 }
 
-const AnswerButton = ({type, answer, firstNumber, secondNumber, onRightAnswer, onWrongAnswer} : AnswerButtonProps) => {
+const AnswerButton = ({answer, correctAnswer, onRightAnswer, onWrongAnswer} : AnswerButtonProps) => {
   const [hasBeenClicked, setHasBeenClicked] = useState(false);
-  const isRightAnswer = ((type === QuestionType.Multiplication && answer === (firstNumber * secondNumber)) ||
-                         (type === QuestionType.Division && answer === (firstNumber / secondNumber)))
+  const isRightAnswer = answer === correctAnswer;
 
   const onClick = () => {
     setHasBeenClicked(true);
@@ -78,31 +26,26 @@ const AnswerButton = ({type, answer, firstNumber, secondNumber, onRightAnswer, o
       onWrongAnswer();
     }
   }
-  
-  // let buttonColor = "primary";
-  // if(hasBeenClicked && isRightAnswer) {
-  //   buttonColor = "success";
-  // } else {
-  //   buttonColor = "error";
-  // }
 
-
+  const buttonColor = hasBeenClicked ? (isRightAnswer ? "success" : "error") : "primary"
   return (
-    <Button fullWidth size="large" variant="contained" onClick={onClick} color={hasBeenClicked ? (isRightAnswer ? "success" : "error") : "primary"}>{answer}</Button>
+    <Button fullWidth size="large" variant="contained" onClick={onClick} color={buttonColor}>{answer}</Button>
   );
 }
 
 type AnswerArrayProps = {
-  type: QuestionType,
-  answers: Array<number>, 
-  firstNumber: number, 
-  secondNumber: number,
+  question: MathQuestion,
   onRightAnswer: () => void,
   onWrongAnswer: () => void  
 }
 
-const AnswerArray = ({type, answers, firstNumber, secondNumber, onRightAnswer, onWrongAnswer} : AnswerArrayProps) => {
-  var buttons = answers.map((x) => <AnswerButton type={type} answer={x} firstNumber={firstNumber} secondNumber={secondNumber} onRightAnswer={onRightAnswer} onWrongAnswer={onWrongAnswer} />);
+const AnswerArray = ({question, onRightAnswer, onWrongAnswer} : AnswerArrayProps) => {
+  var buttons = question.answers.map((x) => <AnswerButton answer={x} 
+    correctAnswer={question.answer} 
+    onRightAnswer={onRightAnswer} 
+    onWrongAnswer={onWrongAnswer} 
+  />);
+
   return (
     <Grid container spacing={2}>
       {buttons.map((x) => <Grid item xs={4}>{x}</Grid>)}
@@ -111,14 +54,12 @@ const AnswerArray = ({type, answers, firstNumber, secondNumber, onRightAnswer, o
 }
 
 type AnswerFieldProps = {
-  type: QuestionType,
-  firstNumber: number, 
-  secondNumber: number,
+  question: MathQuestion,
   onRightAnswer: () => void,
   onWrongAnswer: () => void  
 }
 
-const AnswerField = ({type, firstNumber, secondNumber, onRightAnswer, onWrongAnswer} : AnswerFieldProps) => {
+const AnswerField = ({question, onRightAnswer, onWrongAnswer} : AnswerFieldProps) => {
   const [text, setText] = useState("")
   const [error, setError] = useState(false)
 
@@ -130,8 +71,7 @@ const AnswerField = ({type, firstNumber, secondNumber, onRightAnswer, onWrongAns
     if((event.key === "Enter") && (text !== "")) {
       const parsedInt = parseInt(text);
       if(parsedInt) {
-        if((type === QuestionType.Multiplication && parsedInt === (firstNumber * secondNumber)) ||
-           (type === QuestionType.Division && parsedInt === (firstNumber / secondNumber)) )  
+        if(parsedInt === question.answer)  
         {
           onRightAnswer()
         } else {
@@ -157,16 +97,13 @@ const AnswerField = ({type, firstNumber, secondNumber, onRightAnswer, onWrongAns
 }
 
 type QuestionProps = {
-  type: QuestionType,
-  firstNumber: number, 
-  secondNumber: number,  
+  question: MathQuestion,
   multipleChoices: boolean,
   onRightAnswer: () => void,
   onWrongAnswer: () => void   
 }
 
-const Question = ({type, firstNumber, secondNumber, multipleChoices, onRightAnswer, onWrongAnswer}: QuestionProps) => {
-  const [answers, setAnswers] = useState(generateAnswersArray(type, firstNumber, secondNumber, 6))
+const Question = ({question, multipleChoices, onRightAnswer, onWrongAnswer}: QuestionProps) => {
   const [wrong, setWrong] = useState(false);
 
   const wrongAnswer = () => {
@@ -184,18 +121,13 @@ const Question = ({type, firstNumber, secondNumber, multipleChoices, onRightAnsw
   const answerInput = () => {
     if(multipleChoices) {
       return <AnswerArray 
-        type={type}
-        answers={answers} 
-        firstNumber={firstNumber} 
-        secondNumber={secondNumber} 
+        question={question} 
         onRightAnswer={rightAnswer} 
         onWrongAnswer={wrongAnswer} 
       />
     } else {
       return <AnswerField 
-        type={type}
-        firstNumber={firstNumber} 
-        secondNumber={secondNumber} 
+        question={question}
         onRightAnswer={rightAnswer} 
         onWrongAnswer={wrongAnswer} 
       />
@@ -203,26 +135,26 @@ const Question = ({type, firstNumber, secondNumber, multipleChoices, onRightAnsw
   }
 
   var opCharacter = "x"
-  switch(type) {
-    case QuestionType.Multiplication:
+  switch(question.type) {
+    case OperationType.Multiplication:
       opCharacter = "x";
       break;
-    case QuestionType.Division:
+    case OperationType.Division:
       opCharacter = "/";
       break;
-    case QuestionType.Addition:
+    case OperationType.Addition:
       opCharacter = "+";
       break;
-    case QuestionType.Subtraction:
+    case OperationType.Subtraction:
       opCharacter = "-";
   }
 
   return(
     <>
-      <Typography variant="h3">{firstNumber} {opCharacter} {secondNumber}</Typography>
+      <Typography variant="h3">{question.op1} {opCharacter} {question.op2}</Typography>
       {answerInput()}
     </>
   );
 }
 
-export {generateAnswersArray, Question, QuestionType}
+export { Question }

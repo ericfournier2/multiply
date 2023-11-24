@@ -18,7 +18,7 @@ import type { GameOptions } from './Modes';
 import Quiz from './Quiz';
 import type { Profile, ExamResults } from './Profiles';
 import Profiles from './Profiles';
-
+import { generateQuiz } from './QuizGenerator';
 
 function getActiveProfile(profiles: Array<Profile>) {
   return profiles.find((x) => x.active)
@@ -30,19 +30,17 @@ function App() {
   const [options, setOptions] = useState(defaultGameOptions);
   const [id, setId] = useState("timeLimitPractice");
   const [profiles, setProfiles] = useLocalStorage("profiles", []);
+  const [quiz, setQuiz] = useState(generateQuiz("defaultQuiz", options))
+
   // const [activeProfile, setActiveProfile] = useState(profiles.length > 0 ? profiles[0] : undefined)
 
-  const initializeGame = () => {
-    setStarted(true)
-    setQuizKey(quizKey + 1)
-  }
-
-  const onModeSelect = (id:string, options?: GameOptions) => {
+  const onModeSelect = (id:string, options: GameOptions) => {
     if(options) {
       setOptions(options)
     }
-    setId(id)
-    initializeGame()
+    setQuiz(generateQuiz(id, options))
+    setStarted(true)
+    setQuizKey(quizKey + 1)
   }
 
   const onQuit = (results?: ExamResults) => {
@@ -88,7 +86,7 @@ function App() {
       <Container>
         {!started ?
           <ModeSelect stats={getActiveProfile(profiles)?.stats}  onSelect={onModeSelect}/> :
-          <Quiz id={id} options={options} onQuit={onQuit} key={quizKey}/>
+          <Quiz quiz={quiz} onQuit={onQuit} key={quizKey}/>
         }        
       </Container>
     </div>

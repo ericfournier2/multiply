@@ -41,7 +41,7 @@ function ModeButton({passed, title, description, icon, onClick, disabled=false}:
 }
 
 type ModeSelectProps = {
-  onSelect: (id: string, options?: GameOptions) => void,
+  onSelect: (id: string, options: GameOptions) => void,
   stats?: Stats
 }
 
@@ -56,7 +56,7 @@ function ModeSelect({onSelect, stats}: ModeSelectProps) {
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [optionMode, setOptionsMode] = useState("suddenDeath");
 
-  const modeSelectCallback = (id: string, options?: GameOptions) => () => onSelect(id, options);
+  const modeSelectCallback = (id: string, options: GameOptions) => () => onSelect(id, options);
 
   const exams = examsDefinitions.map((x) => 
     <ModeButton passed={stats ? stats.exams.some((y) => ((y.id === x.id) && y.passed)) : false}
@@ -81,7 +81,6 @@ function ModeSelect({onSelect, stats}: ModeSelectProps) {
       <Options open={optionsOpen} options={options} onChange={onOptionsChange} onClose={modeSelectCallback(optionMode, options)} />
       <ModeButton icon="suddendeathicon.svg" title="Mort soudaine" description="Une erreur, et c'est fini!" onClick={customModeCallback("suddenDeathPractice")}/>
       <ModeButton icon="stopwatch.svg" title="Temps limite" description="Fais le plus de point dans le temps imparti!" onClick={customModeCallback("timeLimitPractice")} />
-      <ModeButton icon="pairs.svg" title="Jeu de paires" description="Trouve les paires d'opérations!" onClick={modeSelectCallback("pairs", undefined)} disabled/>
       {exams}
     </Grid>
   );

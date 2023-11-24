@@ -8,48 +8,14 @@ import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 
-import { randomIntegerInRange } from './Utils';
-import type { GameOptions } from './Modes';
 import { GameType } from './Modes';
-import { Question, QuestionType } from "./Question";
+import { Question } from "./Question";
 import type { ExamResults } from "./Profiles";
+import { Quiz } from './QuizGenerator';
 
-type QuizProps = {
-  id: string,
-  options: GameOptions,
+type QuizControlProps = {
+  quiz: Quiz,
   onQuit: (results?: ExamResults) => void
-}
-
-function pickNumbers(options: GameOptions) {
-  let n1 = 0;
-  let n2 = 0;
-  
-  if(options.multiplicationOptions) {
-    if(!options.multiplicationOptions.useTables) {
-      n1 = randomIntegerInRange(options.multiplicationOptions.minNumber, options.multiplicationOptions.maxNumber);
-      n2 = randomIntegerInRange(options.multiplicationOptions.minNumber, options.multiplicationOptions.maxNumber);
-    } else {
-      n1 = options.multiplicationOptions.tables[randomIntegerInRange(0, options.multiplicationOptions.tables.length)];
-      if(options.multiplicationOptions.excludeZeroAndOne) {
-        n2 = randomIntegerInRange(2, options.multiplicationOptions.maxNumber);
-      } else {
-        n2 = randomIntegerInRange(0, options.multiplicationOptions.maxNumber);
-      }
-    }
-
-    return {n1:n1, n2:n2}
-  } else if(options.divisionOptions) {
-    n1 = options.divisionOptions.tables[randomIntegerInRange(0, options.divisionOptions.tables.length)];
-    if(options.divisionOptions.excludeOne) {
-      n2 = randomIntegerInRange(2, options.divisionOptions.maxNumber);
-    } else {
-      n2 = randomIntegerInRange(1, options.divisionOptions.maxNumber);
-    }    
-
-    return {n1: n1 * n2, n2: n2}
-  } else {
-    return {n1: 1, n2: 1}
-  }
 }
 
 function scorePercent(score: number, wrongAnswers: number) {
@@ -60,25 +26,22 @@ function scorePercentString(score: number, wrongAnswers: number) {
   return `${score} / ${score + wrongAnswers} (${scorePercent(score, wrongAnswers).toFixed(0)})%`
 }
 
-
-function Quiz({id, options, onQuit}: QuizProps) {
+function QuizControl({quiz, onQuit}: QuizControlProps) {
   const [lost, setLost] = useState(false);
   const [score, setScore] = useState(0);
+  const [questionNumber, setQuestionNumber] = useState(0);
   const [wrongAnswers, setWrongAnswers] = useState(0);
-  const [questionKey, setQuestionKey] = useState(1);
-
-  // Pick default numbers to be used on the first render.
-  const {n1, n2} = pickNumbers(options)
-  const [firstNumber, setFirstNumber] = useState(n1);
-  const [secondNumber, setSecondNumber] = useState(n2);
+  
+  const quizMode = quiz.options.quizOptions.mode
+  const timeLimit = quiz.options.quizOptions.timeLimit
 
   // Set up the timer.
   const expiryTimestamp = new Date();
-  expiryTimestamp.setSeconds(expiryTimestamp.getSeconds() + (options.quizOptions.timeLimit * 60))
+  expiryTimestamp.setSeconds(expiryTimestamp.getSeconds() + (timeLimit * 60))
   const [timerExpiry, setTimerExpiry] = useState(expiryTimestamp);
 
   const onTimerExpire = () => {
-    if(options.quizOptions.mode == GameType.TimeLimit) {
+    if(quizMode == GameType.TimeLimit) {
       setLost(true);
     }
   }
@@ -96,34 +59,25 @@ function Quiz({id, options, onQuit}: QuizProps) {
     restart,
   } = useTimer({ expiryTimestamp: timerExpiry, onExpire: onTimerExpire });
 
-
-  const initializeMultiplication = () => {
-    const {n1, n2} = pickNumbers(options)
-    setFirstNumber(n1)
-    setSecondNumber(n2)
-    setQuestionKey(questionKey + 1)    
-  }
-
   const onRightAnswer = () => {
     setScore(score + 1)
-
-    initializeMultiplication()
+    setQuestionNumber(questionNumber + 1)
   }
 
   const onWrongAnswer = () => {
     setWrongAnswers(wrongAnswers + 1)
-    if(options.quizOptions.mode == GameType.SuddenDeath) {
+    if(quizMode == GameType.SuddenDeath) {
       setLost(true)
     } else {
-      initializeMultiplication()      
+      setQuestionNumber(questionNumber + 1)  
     }
   }
 
   const restartClick = () => {
     const results = {
       score: scorePercent(score, wrongAnswers),
-      passed: score > options.quizOptions.threshold,
-      id: id
+      passed: score > quiz.options.quizOptions.threshold,
+      id: quiz.id
     }
     onQuit(results)
   }
@@ -142,13 +96,13 @@ function Quiz({id, options, onQuit}: QuizProps) {
   };
 
   const renderTimer = () => {
-    if(options.quizOptions.mode == GameType.TimeLimit) {
+    if(quizMode == GameType.TimeLimit) {
       return <CountdownCircleTimer
         size={90}
         isPlaying
-        duration={options.quizOptions.timeLimit * 60}
+        duration={timeLimit * 60}
         colors={['#32a852', '#fff824', '#f70000']}
-        colorsTime={[options.quizOptions.timeLimit * 60, options.quizOptions.timeLimit * 30, 0]}          
+        colorsTime={[timeLimit * 60, timeLimit * 30, 0]}          
       >
         {renderTime}
       </CountdownCircleTimer>
@@ -158,7 +112,7 @@ function Quiz({id, options, onQuit}: QuizProps) {
   }
 
   const gameSummary = () => {
-    if(options.quizOptions.mode == GameType.TimeLimit) {    
+    if(quiz.options.quizOptions.mode == GameType.TimeLimit) {    
       return <Typography>Résultats: {scorePercentString(score, wrongAnswers)}</Typography>
     } else {
       return <Typography>Score: {score}</Typography>
@@ -179,13 +133,11 @@ function Quiz({id, options, onQuit}: QuizProps) {
         </Grid>        
         <Grid item xs={12}>
           {!lost ?
-              <Question type={options.multiplicationOptions ? QuestionType.Multiplication : QuestionType.Division}
-                        firstNumber={firstNumber} 
-                        secondNumber={secondNumber} 
+              <Question question={quiz.questions[questionNumber]}
                         onRightAnswer={onRightAnswer}
                         onWrongAnswer={onWrongAnswer} 
-                        multipleChoices={options.quizOptions.multipleChoices}
-                        key={questionKey}/> :
+                        multipleChoices={quiz.options.quizOptions.multipleChoices}
+                        key={questionNumber}/> :
               <>
                 <Typography>Partie terminée!</Typography>
                 {gameSummary()}
@@ -198,4 +150,4 @@ function Quiz({id, options, onQuit}: QuizProps) {
   );
 }
 
-export default Quiz;
+export default QuizControl;
